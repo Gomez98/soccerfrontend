@@ -1,0 +1,21 @@
+.nav-soccer {
+    background-color: rgb(31, 31, 114);
+    text-decoration: none;
+}
+
+.nav-soccer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.nav-soccer-item{
+    margin: 5px 10px;
+}
+.nav-soccer-link{
+    text-decoration: none;
+    color:white;
+    font-size: 18px;
+    font-weight: 600;
+}
+

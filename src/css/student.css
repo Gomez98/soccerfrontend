@@ -1,0 +1,10 @@
+.student-form{
+    display:flex;
+    flex-direction: column;
+    background-color: rgb(231, 231, 231);
+    margin: auto;
+    width: 600px;
+    border-radius: 10px;
+
+}
+
