@@ -1,0 +1,10 @@
+.no-border-input {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border: none;
+  }
+  

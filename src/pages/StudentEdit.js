@@ -1,10 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -13,21 +8,8 @@ import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import StudentTable from '../components/StudentTable';
 import { validate as validateEmail } from 'email-validator';
 
-
-const ADD_STUDENT_MUTATION = gql`
-mutation AddStudent($student: StudentInput){
-    addStudent(student:$student){
-      firstName
-      lastName
-      age
-    }
-  }
-`;
 
 const UPDATE_STUDENT = gql`
 mutation UpdateStudent($student: StudentInput){
@@ -37,15 +19,16 @@ mutation UpdateStudent($student: StudentInput){
   }
 `;
 
-const Student = ({onChangeStudent}) => {
+const StudentEdit = ({ student }) => {
 
     const navigate = useNavigate();
-    const [tabValue, setTabValue] = React.useState('all');
-    const [firstName, setFirstName] = React.useState('');
-    const [lastName, setLastName] = React.useState('');
-    const [age, setAge] = React.useState('');
-    const [dni, setDni] = React.useState('');
-    const [email, setEmail] = React.useState('');
+
+    const [firstName, setFirstName] = React.useState(student.firstName);
+    const [lastName, setLastName] = React.useState(student.lastName);
+    const [age, setAge] = React.useState(student.age);
+    const [dni, setDni] = React.useState(student.dni);
+    const [email, setEmail] = React.useState(student.email);
+
     const [emailError, setEmailError] = React.useState('');
     const [firstNameError, setFirstNameError] = React.useState('');
     const [lastNameError, setLastNameError] = React.useState('');
@@ -55,39 +38,7 @@ const Student = ({onChangeStudent}) => {
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
     const [snackbarMessage, setSnackbarMessage] = React.useState('');
 
-    const [submitStudent, { loading: submitLoading, error: submitError }] = useMutation(ADD_STUDENT_MUTATION);
     const [updateStudent, { loading: updateLoading, error: updateError }] = useMutation(UPDATE_STUDENT);
-
-
-    const handleChangeTab = (event, newValue) => {
-        setTabValue(newValue)
-    }
-
-    const handleDelete = (student) => {
-        handleUpdateStudent({ ...student, deleted: true});
-    }
-
-    const handleEdit = (student) => {
-        onChangeStudent(student)
-        navigate('/student/edit/'+ student.id);
-    }
-
-    const handleUpdateStudent = (selectedStudent) => {
-        const { __typename, ...updatedStudent } = selectedStudent;
-
-        updateStudent({
-            variables: {student: updatedStudent}
-        }).then(() => {
-            setOpenSnackbar(true);
-            setSnackbarMessage('Estudiante actualizado satisfactoriamente');
-            setTimeout(() => {
-                setTabValue('all')
-            }, 2000);
-        }).catch((error) => {
-            setOpenSnackbar(true);
-            setSnackbarMessage('Error al actualizar el estudiante');
-        });
-    }
 
     const handleChangeFirstName = (event) => {
         setFirstName(event.target.value);
@@ -133,7 +84,8 @@ const Student = ({onChangeStudent}) => {
             setEmailError('');
         }
     }
-    const handleSubmit = () => {
+
+    const handleUpdate = () => {
         if (!firstName) {
             setFirstNameError('El nombre es obligatorio');
             return;
@@ -163,59 +115,37 @@ const Student = ({onChangeStudent}) => {
         
 
         const ageValue = parseInt(age, 10);
-        submitStudent({
+        updateStudent({
             variables: {
-                student: { firstName, lastName, age: ageValue, dni, email }
+                student: { id:student.id, firstName, lastName, age: ageValue, dni, email }
             }
         }).then(() => {
             setOpenSnackbar(true);
-            setSnackbarMessage('Estudiante registrado satisfactoriamente');
+            setSnackbarMessage('Estudiante actualizado satisfactoriamente');
             setTimeout(() => {
                 setAge('')
                 setFirstName('')
                 setLastName('')
                 setDni('')
                 setEmail('')
-                setTabValue('all')
+                navigate('/student');
             }, 2000);
         }).catch((error) => {
             setOpenSnackbar(true);
-            setSnackbarMessage('Error al registrar el estudiante');
+            setSnackbarMessage('Error al actualizar el estudiante');
         });
     }
 
-    const handleCloseSnackBar = () => {
-        setOpenSnackbar(false);
-    }
-    
-    if (submitLoading) {
-        return (
-            <Box sx={{ width: '100%' }}>
-                <LinearProgress />
-            </Box>)
-    }
     if (updateLoading) {
         return (
             <Box sx={{ width: '100%' }}>
                 <LinearProgress />
             </Box>)
     }
+
     return (
-        <Container component="main">
-            <Box sx={{ width: '100%', bgcolor: 'background.paper', mt: 10, mb: 5 }}>
-                <Tabs value={tabValue} onChange={handleChangeTab} centered>
-                    <Tab value="all" label="Todos" />
-                    <Tab value="create" label="Registrar Estudiante" />
-                </Tabs>
-            </Box>
-
-            {tabValue === 'all' && (
-                <StudentTable tabValue={tabValue} onDelete={handleDelete} onEdit={handleEdit} />
-            )}
-
-
-            {(tabValue == "create") && (
-                <Box sx={{ width: '300px', margin: 'auto' }}>
+        <Container component="main" maxWidth="sm">
+            <Box sx={{ width: '300px', margin: 'auto', mt: 10}}>
                     <TextField fullWidth sx={{ mb: 2}} placeholder="Nombres*" value={firstName} onChange={handleChangeFirstName} required error={Boolean(firstNameError)} helperText={firstNameError} />
                     <TextField fullWidth sx={{ mb: 2 }} placeholder="Apellidos*" value={lastName} onChange={handleChangeLastName} required
                         error={Boolean(lastNameError)} helperText={lastNameError} />
@@ -224,13 +154,11 @@ const Student = ({onChangeStudent}) => {
                     <TextField fullWidth sx={{ mb: 2 }} type="number" placeholder="Dni/Pasaporte*" value={dni} onChange={handleChangeDni} required error={Boolean(dniError)} helperText={dniError} inputProps={{ min: 8 }}/>
                     <TextField fullWidth sx={{ mb: 2 }} placeholder="Email*" value={email} onChange={handleChangeEmail} required
                         error={Boolean(emailError)} helperText={emailError} />
-                    <Button fullWidth sx={{ mb: 2 }} type="submit" variant="contained" onClick={handleSubmit}>Registrar</Button>
+                    <Button fullWidth sx={{ mb: 2 }} type="submit" variant="contained" onClick={handleUpdate}>Actualizar</Button>
 
                 </Box>
-            )
-            }
 
-            {openSnackbar && (<Snackbar
+                {openSnackbar && (<Snackbar
                 open={openSnackbar}
                 autoHideDuration={3000}
                 onClose={() => setOpenSnackbar(false)}
@@ -241,7 +169,7 @@ const Student = ({onChangeStudent}) => {
                 </Alert>
             </Snackbar>)}
         </Container>
-    )
-};
+    );
+}
 
-export default Student;
+export default StudentEdit;
