@@ -12,6 +12,7 @@ import TablePagination from "@mui/material/TablePagination";
 import LinearProgress from '@mui/material/LinearProgress';
 import { useQuery, gql } from '@apollo/client';
 import Box from '@mui/material/Box';
+import TextField from "@mui/material/TextField";
 
 const GET_PAYMENTS = gql`
 query AllPayments{
@@ -48,8 +49,14 @@ const StudentTable = ({ tabValue }) => {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [searchTerm, setSearchTerm] = React.useState('');
 
     const { loading, data, refetch } = useQuery(GET_PAYMENTS);
+
+    const handleChangeSearchTerm = (event) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -75,6 +82,13 @@ const StudentTable = ({ tabValue }) => {
 
     return (
         <TableContainer component={Paper}>
+            <TextField
+                fullWidth
+                sx={{ mb: 2 }}
+                placeholder="Buscar por nombre"
+                value={searchTerm}
+                onChange={handleChangeSearchTerm}
+            />
             <Table sx={{ minWidth: 700 }} >
                 <TableHead>
                     <TableRow>
@@ -85,14 +99,31 @@ const StudentTable = ({ tabValue }) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {(rowsPerPage > 0 ? data.allPayments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : data).map((row) => (
+                    {data && Array.isArray(data.allPayments)
+                        ? data.allPayments
+                            .filter(
+                                (payment) =>
+                                    payment.studentName.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                                <StyledTableRow key={row.id}>
+                                    <StyledTableCell align="center">{row.id}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.studentName}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.mode}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.amount}</StyledTableCell>
+                                </StyledTableRow>
+                            ))
+                        : null}
+
+                    {/*(rowsPerPage > 0 ? data.allPayments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : data).map((row) => (
                         <StyledTableRow key={row.id}>
                             <StyledTableCell align="center">{row.id}</StyledTableCell>
                             <StyledTableCell align="center">{row.studentName}</StyledTableCell>
                             <StyledTableCell align="center">{row.mode}</StyledTableCell>
                             <StyledTableCell align="center">{row.amount}</StyledTableCell>
                         </StyledTableRow>
-                    ))}
+                    ))*/}
                 </TableBody>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}

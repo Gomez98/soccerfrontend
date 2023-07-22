@@ -20,16 +20,15 @@ import { useQuery, gql, useMutation } from '@apollo/client';
 import Box from '@mui/material/Box';
 import TextField from "@mui/material/TextField";
 
-const GET_STUDENTS = gql`
-query AllStudents{
-    allStudents{
+const GET_USERS = gql`
+query AllUsers {
+    allUsers {
       id
       firstName
       lastName
-      age
-      dni
       email
-      deleted
+      password
+      role
     }
   }
 `;
@@ -53,20 +52,18 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const StudentTable = ({ tabValue, onEdit, onDelete }) => {
+const UserTable = ({ tabValue, onEdit, onDelete }) => {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [searchTerm, setSearchTerm] = React.useState('');
 
-    const { loading, error, data, refetch } = useQuery(GET_STUDENTS);
-
+    const { loading, error, data, refetch } = useQuery(GET_USERS);
 
     const handleChangeSearchTerm = (event) => {
         const value = event.target.value;
         setSearchTerm(value);
     };
-
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -105,18 +102,18 @@ const StudentTable = ({ tabValue, onEdit, onDelete }) => {
                         <StyledTableCell align="center">ID</StyledTableCell>
                         <StyledTableCell align="center">Nombres</StyledTableCell>
                         <StyledTableCell align="center">Apellidos</StyledTableCell>
-                        <StyledTableCell align="center">Edad</StyledTableCell>
-                        <StyledTableCell align="center">Dni</StyledTableCell>
                         <StyledTableCell align="center">Email</StyledTableCell>
+                        <StyledTableCell align="center">Rol</StyledTableCell>
+                        <StyledTableCell align="center">Contraseña</StyledTableCell>
                         <StyledTableCell align="center">Acciones</StyledTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {data && Array.isArray(data.allStudents)
-                        ? data.allStudents
+                    {data && Array.isArray(data.allUsers)
+                        ? data.allUsers
                             .filter(
-                                (student) =>
-                                    student.firstName.toLowerCase().includes(searchTerm.toLowerCase())
+                                (user) =>
+                                    user.firstName.toLowerCase().includes(searchTerm.toLowerCase())
                             )
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row) => (
@@ -124,9 +121,9 @@ const StudentTable = ({ tabValue, onEdit, onDelete }) => {
                                     <StyledTableCell align="center">{row.id}</StyledTableCell>
                                     <StyledTableCell align="center">{row.firstName}</StyledTableCell>
                                     <StyledTableCell align="center">{row.lastName}</StyledTableCell>
-                                    <StyledTableCell align="center">{row.age}</StyledTableCell>
-                                    <StyledTableCell align="center">{row.dni}</StyledTableCell>
                                     <StyledTableCell align="center">{row.email}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.role}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.password.slice(0, 10)}...</StyledTableCell>
                                     <StyledTableCell align="center">
                                         <IconButton onClick={() => onEdit(row)}>
                                             <EditIcon />
@@ -139,15 +136,15 @@ const StudentTable = ({ tabValue, onEdit, onDelete }) => {
                             ))
                         : null}
 
-                    {/*(rowsPerPage > 0 && data && Array.isArray(data.allStudents) ? data.allStudents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : []).map((row) => (
+                    {/*(rowsPerPage > 0 && data && Array.isArray(data.allUsers) ? data.allUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : []).map((row) => (
 
                         <StyledTableRow key={row.id}>
                             <StyledTableCell align="center">{row.id}</StyledTableCell>
                             <StyledTableCell align="center">{row.firstName}</StyledTableCell>
                             <StyledTableCell align="center">{row.lastName}</StyledTableCell>
-                            <StyledTableCell align="center">{row.age}</StyledTableCell>
-                            <StyledTableCell align="center">{row.dni}</StyledTableCell>
                             <StyledTableCell align="center">{row.email}</StyledTableCell>
+                            <StyledTableCell align="center">{row.role}</StyledTableCell>
+                            <StyledTableCell align="center">{row.password.slice(0, 10)}...</StyledTableCell>
                             <StyledTableCell align="center">
                                 <IconButton onClick={() => onEdit(row)}>
                                     <EditIcon />
@@ -162,7 +159,7 @@ const StudentTable = ({ tabValue, onEdit, onDelete }) => {
             </Table>
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
-                count={data?.allStudents?.length || 0}
+                count={data?.allUsers?.length || 0}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -172,4 +169,4 @@ const StudentTable = ({ tabValue, onEdit, onDelete }) => {
         </TableContainer>
     )
 }
-export default StudentTable
+export default UserTable

@@ -75,6 +75,13 @@ const Layout = ({ auth, onLogout, navigate }) => {
                             </Link>
                         </ListItem>
                         <ListItem disablePadding>
+                            <Link to="/user" className="nav-link">
+                                <ListItemButton>
+                                    <ListItemText primary={'Usuarios'}></ListItemText>
+                                </ListItemButton>
+                            </Link>
+                        </ListItem>
+                        <ListItem disablePadding>
                                 <ListItemText primary={'Procesos'}></ListItemText>
                         </ListItem>
                         <ListItem disablePadding>

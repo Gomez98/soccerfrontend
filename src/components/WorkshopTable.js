@@ -15,6 +15,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TextField from "@mui/material/TextField";
 
 const GET_WORKSHOPS = gql`
 query AllWorkshop{
@@ -51,8 +52,14 @@ const WorkshopTable = ({ tabValue, onEdit, onDelete }) => {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    
+    const [searchTerm, setSearchTerm] = React.useState('');
+
     const { loading, data, refetch } = useQuery(GET_WORKSHOPS);
+
+    const handleChangeSearchTerm = (event) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -78,6 +85,13 @@ const WorkshopTable = ({ tabValue, onEdit, onDelete }) => {
 
     return (
         <TableContainer component={Paper}>
+            <TextField
+                fullWidth
+                sx={{ mb: 2 }}
+                placeholder="Buscar por nombre"
+                value={searchTerm}
+                onChange={handleChangeSearchTerm}
+            />
             <Table sx={{ minWidth: 700 }} >
                 <TableHead>
                     <TableRow>
@@ -88,7 +102,31 @@ const WorkshopTable = ({ tabValue, onEdit, onDelete }) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {(rowsPerPage > 0 && data && Array.isArray(data.allWorkshops) ? data.allWorkshops.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : []).map((row) => (
+
+                    {data && Array.isArray(data.allWorkshops)
+                        ? data.allWorkshops
+                            .filter(
+                                (workshop) =>
+                                    workshop.name.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                                <StyledTableRow key={row.id}>
+                                    <StyledTableCell align="center">{row.id}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.name}</StyledTableCell>
+                                    <StyledTableCell align="center">{row.price}</StyledTableCell>
+                                    <StyledTableCell align="center">
+                                        <IconButton onClick={() => onEdit(row)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton onClick={() => onDelete(row)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </StyledTableCell>
+                                </StyledTableRow>
+                            ))
+                        : null}
+                    {/*(rowsPerPage > 0 && data && Array.isArray(data.allWorkshops) ? data.allWorkshops.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : []).map((row) => (
                         <StyledTableRow key={row.id}>
                             <StyledTableCell align="center">{row.id}</StyledTableCell>
                             <StyledTableCell align="center">{row.name}</StyledTableCell>
@@ -102,7 +140,7 @@ const WorkshopTable = ({ tabValue, onEdit, onDelete }) => {
                                 </IconButton>
                             </StyledTableCell>
                         </StyledTableRow>
-                    ))}
+                    ))*/}
                 </TableBody>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}

@@ -187,7 +187,7 @@ const Registration = () => {
                                 onChange={handleSelectedSchedule}
                             >
                                 {schedules.map((schedule) => (
-                                    <MenuItem key={schedule} value={schedule}>
+                                    <MenuItem key={schedule.id} value={schedule}>
                                         {schedule}
                                     </MenuItem>
                                 ))}

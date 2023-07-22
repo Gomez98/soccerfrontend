@@ -9,36 +9,38 @@ import Container from "@mui/material/Container";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { validate as validateEmail } from 'email-validator';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
 
 
-const UPDATE_STUDENT = gql`
-mutation UpdateStudent($student: StudentInput){
-    updateStudent(student:$student){
+const UPDATE_USER = gql`
+mutation UpdateUser($user: UserInput){
+    updateUser(user:$user){
       id
     }
   }
 `;
 
-const StudentEdit = ({ student }) => {
+const UserEdit = ({ user }) => {
 
     const navigate = useNavigate();
 
-    const [firstName, setFirstName] = React.useState(student.firstName);
-    const [lastName, setLastName] = React.useState(student.lastName);
-    const [age, setAge] = React.useState(student.age);
-    const [dni, setDni] = React.useState(student.dni);
-    const [email, setEmail] = React.useState(student.email);
+    const [firstName, setFirstName] = React.useState(user.firstName);
+    const [lastName, setLastName] = React.useState(user.lastName);
+    const [email, setEmail] = React.useState(user.email);
+    const [role, setRole] = React.useState(user.role);
 
     const [emailError, setEmailError] = React.useState('');
     const [firstNameError, setFirstNameError] = React.useState('');
     const [lastNameError, setLastNameError] = React.useState('');
-    const [ageError, setAgeError] = React.useState('');
-    const [dniError, setDniError] = React.useState('');
+    const [roleError, setRoleError] = React.useState('');
 
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
     const [snackbarMessage, setSnackbarMessage] = React.useState('');
 
-    const [updateStudent, { loading: updateLoading, error: updateError }] = useMutation(UPDATE_STUDENT);
+    const [updateUser, { loading: updateLoading, error: updateError }] = useMutation(UPDATE_USER);
 
     const handleChangeFirstName = (event) => {
         setFirstName(event.target.value);
@@ -56,25 +58,7 @@ const StudentEdit = ({ student }) => {
             setLastNameError('');
         }
     }
-    const handleChangeAge = (event) => {
-        setAge(event.target.value);
-        if (event.target.value.trim() === '') {
-            setAgeError('El campo de edad es obligatorio');
-        } else {
-            setAgeError('');
-        }
-    }
-    const handleChangeDni = (event) => {
-        const inputDni = event.target.value;
-        const truncatedDni = inputDni.slice(0, 10);
-        setDni(truncatedDni);
-        if (truncatedDni.trim() === '') {
-            setDniError('El campo DNI/Pasaporte es obligatorio');
-        } else {
-            setDniError('');
-        }
 
-    }
     const handleChangeEmail = (event) => {
         const value = event.target.value;
         setEmail(value);
@@ -82,6 +66,16 @@ const StudentEdit = ({ student }) => {
             setEmailError('El campo de correo electrónico es obligatorio');
         } else {
             setEmailError('');
+        }
+    }
+
+    const handleChangeRole = (event) => {
+        const value = event.target.value;
+        setRole(value);
+        if (value.trim() === '') {
+            setRoleError('El campo del rol es obligatorio');
+        } else {
+            setRoleError('');
         }
     }
 
@@ -94,17 +88,6 @@ const StudentEdit = ({ student }) => {
             setLastNameError('El apellido es obligatorio');
             return;
         }
-        if (!age) {
-            setAgeError('La edad es obligatoria');
-            return;
-        }
-        if (!dni) {
-            setDniError('El DNI/Pasaporte es obligatorio');
-            return;
-        } else if (dni.length < 8) {
-            setDniError('El DNI/Pasaporte debe tener al menos 8 dígitos');
-            return;
-        }
         if (!email) {
             setEmailError('El email es obligatorio');
             return;
@@ -112,27 +95,28 @@ const StudentEdit = ({ student }) => {
             setEmailError('Ingrese un correo electrónico válido');
             return;
         }
+        if (!role) {
+            setRoleError('El rol es obligatorio');
+            return;
+        }
 
-
-        const ageValue = parseInt(age, 10);
-        updateStudent({
+        updateUser({
             variables: {
-                student: { id: student.id, firstName, lastName, age: ageValue, dni, email }
+                user: { id: user.id, firstName, lastName, email, role }
             }
         }).then(() => {
             setOpenSnackbar(true);
-            setSnackbarMessage('Estudiante actualizado satisfactoriamente');
+            setSnackbarMessage('Usuario actualizado satisfactoriamente');
             setTimeout(() => {
-                setAge('')
                 setFirstName('')
                 setLastName('')
-                setDni('')
                 setEmail('')
-                navigate('/student');
+                setRole('')
+                navigate('/user');
             }, 2000);
         }).catch((error) => {
             setOpenSnackbar(true);
-            setSnackbarMessage('Error al actualizar el estudiante');
+            setSnackbarMessage('Error al actualizar el usuario');
         });
     }
 
@@ -149,11 +133,20 @@ const StudentEdit = ({ student }) => {
                 <TextField fullWidth sx={{ mb: 2 }} placeholder="Nombres*" value={firstName} onChange={handleChangeFirstName} required error={Boolean(firstNameError)} helperText={firstNameError} />
                 <TextField fullWidth sx={{ mb: 2 }} placeholder="Apellidos*" value={lastName} onChange={handleChangeLastName} required
                     error={Boolean(lastNameError)} helperText={lastNameError} />
-                <TextField fullWidth sx={{ mb: 2 }} type="number" placeholder="Edad*" value={age} onChange={handleChangeAge} required
-                    error={Boolean(ageError)} helperText={ageError} />
-                <TextField fullWidth sx={{ mb: 2 }} type="number" placeholder="Dni/Pasaporte*" value={dni} onChange={handleChangeDni} required error={Boolean(dniError)} helperText={dniError} inputProps={{ min: 8 }} />
                 <TextField fullWidth sx={{ mb: 2 }} placeholder="Email*" value={email} onChange={handleChangeEmail} required
                     error={Boolean(emailError)} helperText={emailError} />
+                <FormControl fullWidth required sx={{ mb: 2 }} error={Boolean(roleError)}>
+                        <InputLabel>Rol*</InputLabel>
+                        <Select
+                            value={role}
+                            onChange={handleChangeRole}
+                            label="Rol*"
+                        >
+                            <MenuItem value="ADMIN">ADMIN</MenuItem>
+                            <MenuItem value="USER">USER</MenuItem>
+                        </Select>
+                        {roleError && <Alert severity="error">{roleError}</Alert>}
+                    </FormControl>
                 <Button fullWidth sx={{ mb: 2 }} type="submit" variant="contained" onClick={handleUpdate}>Actualizar</Button>
 
             </Box>
@@ -171,4 +164,4 @@ const StudentEdit = ({ student }) => {
     );
 }
 
-export default StudentEdit;
+export default UserEdit;

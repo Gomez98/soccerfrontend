@@ -13,6 +13,8 @@ import StudentEdit from './pages/StudentEdit';
 import RepresentativeEdit from './pages/RepresentativeEdit';
 import Workshop from './pages/Workshop';
 import WorkshopEdit from './pages/WorkshopEdit';
+import User from './pages/User';
+import UserEdit from './pages/UserEdit';
 import PrivateRoutes from './utils/PrivateRoutes';
 import { useQuery, gql, useMutation } from '@apollo/client';
 
@@ -45,6 +47,8 @@ const App = () => {
   const [selectedStudent, setSelectedStudent] = React.useState(null);
   const [selectedRepresentative, setSelectedRepresentative] = React.useState(null);
   const [selectedWorkshop, setSelectedWorkshop] = React.useState(null);
+  const [selectedUser, setSelectedUser] = React.useState(null);
+
 
 
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
@@ -98,12 +102,13 @@ const App = () => {
     setSelectedWorkshop(workshop);
   }
 
+  const handleSelectedUser = (user) => {
+    setSelectedUser(user);
+  }
+
   const closeSnackbar = () => {
     setOpenSnackbar(false);
   };
-
-  
-
 
   React.useEffect(() => {
     localStorage.setItem('auth', JSON.stringify(auth));
@@ -124,7 +129,9 @@ const App = () => {
             <Route path="/registration" element={<Registration />} exact />
             <Route path="/workshop" element={<Workshop onChangeWorkshop={handleSelectedWorkshop}/>} exact />
             <Route path="/workshop/edit/:id" element={<WorkshopEdit workshop={selectedWorkshop}/>} exact />
-            <Route path="/medicalHistory" element={<Workshop />} exact />
+            <Route path="/user" element={<User onChangeUser={handleSelectedUser}/>} exact />
+            <Route path="/user/edit/:id" element={<UserEdit user={selectedUser}/>} exact />
+
           </Route>
           <Route
             path="/login"
