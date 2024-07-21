@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './pages/Layout';
 import About from './pages/About';
 import Login from './pages/Login';
@@ -60,7 +60,6 @@ const App = () => {
   });
   const [logoutMutation, { loading: logoutLoading, error: logoutError }] = useMutation(LOG_OUT);
   const [submitLogin, { loading: loginLoading, error: loginError }] = useMutation(LOG_IN);
-
 
   const handleLogin = (email, password) => {
     submitLogin({
