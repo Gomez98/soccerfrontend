@@ -47,10 +47,14 @@ const User = ({ onChangeUser }) => {
     const [role, setRole] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+
     const [emailError, setEmailError] = React.useState('');
     const [firstNameError, setFirstNameError] = React.useState('');
     const [lastNameError, setLastNameError] = React.useState('');
     const [roleError, setRoleError] = React.useState('');
+    const [passwordError, setPasswordError] = React.useState('');
+
 
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
     const [snackbarMessage, setSnackbarMessage] = React.useState('');
@@ -127,6 +131,17 @@ const User = ({ onChangeUser }) => {
         }
     }
 
+    const handleChangePassword = (event) => {
+        const value = event.target.value;
+        
+        if (value.trim() === '') {
+            setPasswordError('El campo de la contraseña es obligatorio');
+        } else {
+            setPasswordError('');
+        }
+        setPassword(value);
+    }
+
     const handleSubmit = () => {
         if (!firstName) {
             setFirstNameError('El nombre es obligatorio');
@@ -147,10 +162,14 @@ const User = ({ onChangeUser }) => {
             setRoleError('El rol es obligatorio');
             return;
         }
+        if (!password) {
+            setRoleError('La contraseña es obligatoria');
+            return;
+        }
 
         submitUser({
             variables: {
-                user: { firstName, lastName, email, role }
+                user: { firstName, lastName, email, role, password }
             }
         }).then(() => {
             setOpenSnackbar(true);
@@ -217,6 +236,8 @@ const User = ({ onChangeUser }) => {
                         </Select>
                         {roleError && <Alert severity="error">{roleError}</Alert>}
                     </FormControl>
+                    <TextField fullWidth sx={{ mb: 2 }} placeholder="Contraseña*" value={password} onChange={handleChangePassword} required
+                    error={Boolean(passwordError)} helperText={passwordError} />
                     <Button fullWidth sx={{ mb: 2 }} type="submit" variant="contained" onClick={handleSubmit}>Registrar</Button>
 
                 </Box>

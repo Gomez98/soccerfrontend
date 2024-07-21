@@ -57,21 +57,25 @@ const StudentEdit = ({ student }) => {
         }
     }
     const handleChangeAge = (event) => {
-        setAge(event.target.value);
-        if (event.target.value.trim() === '') {
-            setAgeError('El campo de edad es obligatorio');
+        
+        const inputAge = event.target.value;
+
+        if (inputAge === '' || /^\d+$/.test(inputAge)) {
+            setAge(inputAge); 
+            setAgeError('');   
         } else {
-            setAgeError('');
+            setAgeError('El campo de edad solo permite números positivos');
         }
     }
+   
     const handleChangeDni = (event) => {
         const inputDni = event.target.value;
-        const truncatedDni = inputDni.slice(0, 10);
-        setDni(truncatedDni);
-        if (truncatedDni.trim() === '') {
-            setDniError('El campo DNI/Pasaporte es obligatorio');
+    
+        if (inputDni === '' || /^\d{1,8}$/.test(inputDni)) {
+            setDni(inputDni); 
+            setDniError('');   
         } else {
-            setDniError('');
+            setDniError('Numero de documento solo permite números positivos');
         }
 
     }
@@ -149,9 +153,9 @@ const StudentEdit = ({ student }) => {
                 <TextField fullWidth sx={{ mb: 2 }} placeholder="Nombres*" value={firstName} onChange={handleChangeFirstName} required error={Boolean(firstNameError)} helperText={firstNameError} />
                 <TextField fullWidth sx={{ mb: 2 }} placeholder="Apellidos*" value={lastName} onChange={handleChangeLastName} required
                     error={Boolean(lastNameError)} helperText={lastNameError} />
-                <TextField fullWidth sx={{ mb: 2 }} type="number" placeholder="Edad*" value={age} onChange={handleChangeAge} required
+                <TextField fullWidth sx={{ mb: 2 }} type="text" placeholder="Edad*" value={age} onChange={handleChangeAge} required
                     error={Boolean(ageError)} helperText={ageError} />
-                <TextField fullWidth sx={{ mb: 2 }} type="number" placeholder="Dni/Pasaporte*" value={dni} onChange={handleChangeDni} required error={Boolean(dniError)} helperText={dniError} inputProps={{ min: 8 }} />
+                <TextField fullWidth sx={{ mb: 2 }} type="text" placeholder="Dni*" value={dni} onChange={handleChangeDni} required error={Boolean(dniError)} helperText={dniError} inputProps={{ min: 8 }} />
                 <TextField fullWidth sx={{ mb: 2 }} placeholder="Email*" value={email} onChange={handleChangeEmail} required
                     error={Boolean(emailError)} helperText={emailError} />
                 <Button fullWidth sx={{ mb: 2 }} type="submit" variant="contained" onClick={handleUpdate}>Actualizar</Button>
