@@ -6,7 +6,7 @@ import App from './App';
 
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:8080/graphql',
+  uri: 'https://limitless-savannah-29940-184b4cd6b730.herokuapp.com/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {
