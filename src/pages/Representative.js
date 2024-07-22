@@ -77,6 +77,7 @@ export default function Representative({onChangeRepresentative}) {
             setSnackbarMessage('Apoderado actualizado satisfactoriamente');
             setTimeout(() => {
                 setTabValue('all')
+                refetch();
             }, 2000);
         }).catch((error) => {
             setOpenSnackbar(true);
@@ -128,6 +129,7 @@ export default function Representative({onChangeRepresentative}) {
                 setRepresentativeName('')
                 setSelectedStudent('')
                 setTabValue('all')
+                refetch()
             }, 2000);
         }).catch((error) => {
             setOpenSnackbar(true);
